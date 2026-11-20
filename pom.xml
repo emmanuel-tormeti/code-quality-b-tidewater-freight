@@ -36,7 +36,7 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Lets PIT run JUnit 5 tests on the same platform version -->
+        <!-- Required by pitest-junit5-plugin to run JUnit 5 tests under PIT -->
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
@@ -100,6 +100,9 @@
                     <targetClasses>
                         <param>com.tidewater.freight.*</param>
                     </targetClasses>
+                    <excludedClasses>
+                        <param>com.tidewater.freight.Demo</param>
+                    </excludedClasses>
                     <targetTests>
                         <param>com.tidewater.freight.*</param>
                     </targetTests>
