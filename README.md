@@ -36,7 +36,7 @@ The full analysis of the inherited code, its tests, and the design decisions is 
 | JaCoCo 0.8.12 | Line and branch coverage reports |
 | PIT (pitest-maven 1.16.1) | Mutation testing |
 
-Maven is required. No Maven Wrapper is included in this project.
+The Maven Wrapper is included, so Maven 3.9 does not need to be installed separately. Use `./mvnw` on Linux or macOS, and `mvnw.cmd` on Windows.
 
 ## Project Structure
 
@@ -56,10 +56,18 @@ src/main/java/com/tidewater/freight/
 ├── InMemoryZoneRateRepository.java    map-backed repository
 ├── ShippingException.java             base unchecked exception
 ├── UnknownZoneException.java          no rule configured for a zone
-└── InvalidShipmentException.java      invalid request or unknown zone name
+├── InvalidShipmentException.java      invalid request or unknown zone name
+└── InvalidRateRuleException.java      invalid rate or fee configuration
 
 src/test/java/com/tidewater/freight/
-└── eight test classes, 34 tests in total
+├── ShippingCostServiceTest.java
+├── HeavyItemSurchargeTest.java
+├── ServiceLevelTest.java
+├── FlatRateZoneRuleTest.java
+├── ShipmentRequestTest.java
+├── InMemoryZoneRateRepositoryTest.java
+├── ZoneTest.java
+└── ShippingExceptionTest.java
 ```
 
 ## Design
@@ -144,9 +152,9 @@ The HTML report is written to `target/pit-reports/<timestamp>/index.html`.
 | Suite | Mutation coverage | Test strength | Line coverage |
 |---|---|---|---|
 | Original (3 tests) | 17% (3 of 18 killed) | 27% | 64% |
-| Refactored (34 tests) | 55% (16 of 29 killed) | 94% (16 of 17 covered mutants killed) | 65% (44 of 68) |
+| Refactored (`37` tests) | 94% (17 of 18 killed) | 94% (17 of 18 covered mutants killed) | 100% (46 of 46) |
 
-Test strength is the fairer comparison, because the refactored code has more classes and therefore more mutants. The refactored run has one surviving mutant, from a boundary check, which is still open. It also has 12 mutants with no coverage. These are in `Demo`, which is not excluded from PIT, because `Demo` has no tests.
+Both runs have 18 mutants, so the mutation figures use the same denominator, although the mutants differ because the code changed. The refactored run has one surviving mutant, which is still open. `Demo` is excluded from PIT because it is a wiring entry point with no tests.
 
 ## Documentation
 

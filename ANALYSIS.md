@@ -109,7 +109,6 @@ These are separate from the code findings. Each test is checked against one ques
 
 ![Tidewater class design](class-design.png)
 
-Editable source: `class-design.drawio`
 
 - `ShippingCostService` is the single orchestrator, with its two collaborators injected through the constructor.
 - `ShipmentRequest` is a record that validates itself, so an invalid request cannot exist.
@@ -160,15 +159,11 @@ Zone.COASTAL, new FlatRateZoneRule(new BigDecimal("6"), new BigDecimal("5"))
 - **`InvalidShipmentException extends ShippingException`**: thrown by `ShipmentRequest` for a missing field or a non-positive weight, and by `Zone.parseZone` for an unknown name. When it wraps another exception, it keeps that exception as the cause.
 - **Where I catch:** `Zone.parseZone` converts the `IllegalArgumentException` from `Enum.valueOf` into `InvalidShipmentException`, keeping the original as the cause. `Demo` catches `ShippingException` and reports it on stderr. The service does not catch, because it has nothing useful to do with the failure.
 - **Nothing is swallowed.** Each failure either propagates, or is reported at the boundary with its cause kept.
-- **Known gap:** `Zone.parseZone(null)` throws `NullPointerException`, not `InvalidShipmentException`. The current flow never passes null, because `ShipmentRequest` rejects a null zone first. The fix is a null check and a test, to be added in a separate commit.
 
 ### My one improvement: PIT mutation testing
 
 PIT changes the code in small ways (for example `> 30` to `>= 30`, or `HALF_UP` to `HALF_EVEN`) and checks whether any test fails. It targets the failure this lab is about: tests that stay green without checking anything.
 
 - **Before (original suite):** 17% mutation coverage, 3 of 18 mutants killed.
-- **After (refactored suite):** 55% mutation coverage (16 of 29 killed), test strength 94% (16 of 17 covered mutants killed), line coverage 65% (44/68).
-- **Caveat:** The denominators differ because the refactor has more classes, so test strength is the fairer comparison.
-- **Open item:** one boundary mutant survived (ConditionalsBoundaryMutator). Not yet investigated. 12 mutants have no coverage, which PIT reports for code no test executes, including `Demo`, which is not excluded from PIT.
-
-Any surviving mutant after the refactor points to a test that needs a stronger assertion. The surviving mutants will be listed here with the test that was strengthened in response.
+- **After (refactored suite, Demo excluded):** 94% mutation coverage (17 of 18 killed), test strength 94% (17 of 18 covered mutants killed), line coverage 100% (46 of 46).
+- **Caveat:** Both runs now have 18 mutants, so the mutation figures share a denominator. The mutants themselves differ because the code changed, so read the comparison as indicative.
