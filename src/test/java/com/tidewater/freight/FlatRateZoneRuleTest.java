@@ -28,21 +28,21 @@ class FlatRateZoneRuleTest {
     @Test
     void rejectsMissingRateOrFee() {
         assertEquals("Rate and handling fee are required",
-                assertThrows(IllegalArgumentException.class,
+                assertThrows(InvalidRateRuleException.class,
                         () -> new FlatRateZoneRule(null, BigDecimal.ONE)).getMessage());
         assertEquals("Rate and handling fee are required",
-                assertThrows(IllegalArgumentException.class,
+                assertThrows(InvalidRateRuleException.class,
                         () -> new FlatRateZoneRule(BigDecimal.ONE, null)).getMessage());
     }
 
     @Test
     void rejectsNegativeRateOrFee() {
         assertEquals("Rate and handling fee must not be negative",
-                assertThrows(IllegalArgumentException.class,
+                assertThrows(InvalidRateRuleException.class,
                         () -> new FlatRateZoneRule(new BigDecimal("-1"), BigDecimal.ZERO))
                         .getMessage());
         assertEquals("Rate and handling fee must not be negative",
-                assertThrows(IllegalArgumentException.class,
+                assertThrows(InvalidRateRuleException.class,
                         () -> new FlatRateZoneRule(BigDecimal.ONE, new BigDecimal("-1")))
                         .getMessage());
     }

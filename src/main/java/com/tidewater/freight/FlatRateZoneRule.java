@@ -9,10 +9,10 @@ public class FlatRateZoneRule implements ZoneRateRule {
 
     public FlatRateZoneRule(BigDecimal ratePerKg, BigDecimal handlingFee) {
         if (ratePerKg == null || handlingFee == null) {
-            throw new IllegalArgumentException("Rate and handling fee are required");
+            throw new InvalidRateRuleException("Rate and handling fee are required");
         }
         if (ratePerKg.signum() < 0 || handlingFee.signum() < 0) {
-            throw new IllegalArgumentException("Rate and handling fee must not be negative");
+            throw new InvalidRateRuleException("Rate and handling fee must not be negative");
         }
         this.ratePerKg = ratePerKg;
         this.handlingFee = handlingFee;

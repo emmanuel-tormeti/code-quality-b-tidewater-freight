@@ -32,6 +32,9 @@ public class Demo {
             System.out.println("Result " + label + " -> GHS " + calculation.get());
         } catch (ShippingException e) {
             System.err.println("Result " + label + " -> REJECTED: " + e.getMessage());
+            if (e.getCause() != null) {
+                System.err.println("  caused by: " + e.getCause());
+            }
         }
     }
 

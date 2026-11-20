@@ -21,4 +21,12 @@ class ZoneTest {
         assertEquals("Unknown zone: MOON", thrown.getMessage());
         assertInstanceOf(IllegalArgumentException.class, thrown.getCause());
     }
+
+    @Test
+    void nullNameThrowsInvalidShipmentException() {
+        InvalidShipmentException thrown =
+                assertThrows(InvalidShipmentException.class, () -> Zone.parseZone(null));
+    
+        assertEquals("Zone name is required", thrown.getMessage());
+    }
 }

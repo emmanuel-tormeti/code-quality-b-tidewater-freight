@@ -100,6 +100,30 @@ class ShippingCostServiceTest {
         assertEquals(new BigDecimal("967.50"), cost);
     }
 
+    @Test
+    void domesticStandardUsesRealRule() {
+        ShippingCostService real = new ShippingCostService(
+                new InMemoryZoneRateRepository(Map.of(Zone.DOMESTIC,
+                        new FlatRateZoneRule(new BigDecimal("5"), BigDecimal.ZERO))),
+                new HeavyItemSurcharge());
+
+        // 5 x 10 + 0 = 50
+        assertEquals(new BigDecimal("50.00"),
+                real.calculate(request(Zone.DOMESTIC, "10", ServiceLevel.STANDARD)));
+    }
+
+    @Test
+    void regionalExpressUsesRealRule() {
+        ShippingCostService real = new ShippingCostService(
+                new InMemoryZoneRateRepository(Map.of(Zone.REGIONAL,
+                        new FlatRateZoneRule(new BigDecimal("8"), new BigDecimal("10")))),
+                new HeavyItemSurcharge());
+
+        // (8 x 10 + 10) x 1.5 = 135
+        assertEquals(new BigDecimal("135.00"),
+                real.calculate(request(Zone.REGIONAL, "10", ServiceLevel.EXPRESS)));
+    }
+
     private static ShipmentRequest request(Zone zone, String weightKg, ServiceLevel level) {
         return new ShipmentRequest(zone, new BigDecimal(weightKg), level);
     }
