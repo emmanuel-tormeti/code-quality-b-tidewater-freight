@@ -48,7 +48,7 @@
 | # | Finding | Where | Rule broken | Why it matters |
 |---|---|---|---|---|
 | C1 | `catch (Exception e) { return 0; }` swallows every failure. An unknown zone, a null input or any bug becomes a valid-looking price of 0. The demo prints `0.0` for MOON with no error and no log. | `ShippingCalculator.calculateCost` | AmaliTech Coding Standards §6.1 (never swallow a failure) and §6.3 (add context, keep the cause) | A shipment is quoted for free and nobody is told. |
-| C2 | No input validation. A negative weight gives a negative cost, zero weight still charges the zone fee, and NaN passes through. An unrecognised service level, such as lowercase `"express"`, is silently priced as standard. | `calculateCost` | AmaliTech Coding Standards §6.1. Not stated in the standard: it is ordinary defensive programming to reject bad input at the entry point. | Wrong money with no signal. |
+| C2 | No input validation. A negative weight gives a negative cost, zero weight still charges the zone fee, and NaN passes through. An unrecognised service level, such as lowercase `"express"`, is silently priced as standard. | `calculateCost` | General defensive-programming practice: reject invalid input at the entry point (fail fast). Not stated in the AmaliTech standard or the Google testable-code guide. | Wrong money with no signal. |
 | C3 | The rate source is hard-wired: `private final RateRepository repository = new InMemoryRateRepository();`. The `RateRepository` interface exists but nothing can inject it. The code's own comment admits this. | `ShippingCalculator` field | Dependency Inversion Principle (DIP); AmaliTech Coding Standards §12.5; Google testable-code guide, flaw 1 | No fake or mock can be substituted, which makes the class awkward to test. |
 | C4 | One class does five jobs: rate lookup, zone fees, heavy surcharge, express multiplier and console output. | `ShippingCalculator` | Single Responsibility Principle (SRP); AmaliTech Coding Standards §12.1 and §4.2 (a method does one thing); Google testable-code guide, flaw 4 | It has several reasons to change, and no rule can be tested alone. |
 | C5 | An `if / else if` chain on zone strings holds the zone fees, so zone knowledge is split across two classes. The rate is in the repository and the fee is in the calculator. A new zone added only to the repository would get a rate and silently no fee. | `calculateCost` | Open-Closed Principle (OCP); AmaliTech Coding Standards §12.2. Smells: Switch Statements and Shotgun Surgery. | This is exactly the coming change, and today it forces edits in two places. |
@@ -90,3 +90,19 @@ confirms that the suite proves very little, whatever its green build suggests.
 3. C2 (no validation), C5 (blocks the coming zone) and C3 (blocks testing).
 4. C4, C6, C8, C9, C11, C12.
 5. C7 and C10.
+
+## 5. Proposed design (class sketch)
+
+![Tidewater class design](class-design.png)
+
+Editable source: `class-design.drawio`
+
+The sketch shows:
+- `ShippingCostService` as the single orchestrator, with its two collaborators
+  injected through the constructor.
+- `ShipmentRequest` as a record that validates itself, so an invalid request cannot exist.
+- `ZoneRateRule` and `ZoneRateRepository` as interfaces, with `FlatRateZoneRule` and
+  `InMemoryZoneRateRepository` as implementations.
+- `Zone` and `ServiceLevel` as enums.
+- `HeavyItemSurcharge` as a separate class, so the 30 kg boundary can be tested alone.
+- A `ShippingException` hierarchy of unchecked exceptions.
