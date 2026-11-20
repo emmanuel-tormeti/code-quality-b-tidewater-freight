@@ -1,0 +1,5 @@
+Shipping DOMESTIC (10.0kg, STANDARD): GHS 50.0
+Result DOMESTIC 10kg STANDARD       -> 50.0
+Shipping INTERNATIONAL (40.0kg, EXPRESS): GHS 967.5
+Result INTERNATIONAL 40kg EXPRESS   -> 967.5
+Result unknown zone MOON 10kg STD   -> 0.0
